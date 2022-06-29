@@ -7,14 +7,14 @@ def registrarImagenes(frames):
     set_red = []
     set_green = []
     set_blue = []
-    path = "PDI\Recortes\imagen0.jpg"
+    path = "Recortes\imagen0.jpg"
     image_base = img.imread(path)
     
     img2 = cv2.cvtColor(image_base, cv2.COLOR_BGR2GRAY)
     kp1, d1 = orb_detector.detectAndCompute(img2, None) 
 
     for j in range(0, frames):
-        path1 = "PDI\Recortes\imagen"+str(j)+".jpg"
+        path1 = "Recortes\imagen"+str(j)+".jpg"
         image_registrar = img.imread(path1)
 
         img1 = cv2.cvtColor(image_registrar, cv2.COLOR_BGR2GRAY)
@@ -43,7 +43,7 @@ def registrarImagenes(frames):
         homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC) 
         
         transformed_img = cv2.warpPerspective(image_registrar, homography,(width, height))
-        cv2.imwrite("PDI\Registradas\imagen"+str(j)+".jpg",transformed_img)
+        cv2.imwrite("Registradas\imagen"+str(j)+".jpg",transformed_img)
 
         set_red.append(transformed_img[::,::,0])
         set_green.append(transformed_img[::,::,1])
@@ -151,20 +151,20 @@ def aplicarGuasianoImagenes(stack_red, stack_green, stack_blue):
 
 def aplicarHighBoostImagenes(stack_red, stack_green, stack_blue):
     imgMedia = aplicarMediaImagenes(stack_red, stack_green, stack_blue)
-    imgOriginal = cv2.imread("PDI\Recortes\imagen0.jpg")
+    imgOriginal = cv2.imread("Recortes\imagen0.jpg")
     imgHighBoost = 2*imgOriginal-imgMedia
     return imgHighBoost
 
 def ecualizarImagenes_Local(image, kernel=3):
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = (kernel-1)//2
-    pcentral = (kernel+1)//2
+    matrizDistancias = obtenerMatrizDistancias(kernel-1)
     shape = img_gray.shape
     nueva = np.zeros(shape, dtype="uint8")
     for i in range(delta, shape[0]-delta):
         for j in range(delta, shape[1]-delta):
             ecualize = cv2.equalizeHist(img_gray[i-delta:i+delta+1,j-delta:j+delta+1])
-            nueva[i,j] = ecualize[pcentral, pcentral]
+            nueva[i,j] = np.mean(ecualize*matrizDistancias)
     return nueva
 
 def ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, kernel=3):
@@ -180,3 +180,14 @@ def ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, kernel=3):
         list_green.append(equ_green)
         list_blue.append(equ_blue)
     return promediarImagenes(list_red, list_green, list_blue)
+
+def obtenerMatrizDistancias(kernel):
+    matriz = np.ones((kernel, kernel))
+    centro = [(kernel+1)//2-1, (kernel+1)//2-1]
+    for i in range(kernel):
+        for j in range(kernel):
+            c1 = centro[0]-i
+            c2 = centro[1]-j
+            distancia = np.sqrt((c1*c1)+(c2*c2))
+            matriz[i, j] = kernel-distancia
+    return matriz

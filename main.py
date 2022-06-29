@@ -8,7 +8,7 @@ frames = 60
 
 def crearRecorte(cant):
     img = frame[w:ew, h:eh]
-    path = "PDI\Recortes\imagen" + "%d"%i+".jpg"
+    path = "Recortes\imagen" + "%d"%i+".jpg"
     cv2.imwrite(path,img)
 
 def cut(event, x, y, flags, param):
@@ -39,7 +39,7 @@ def cut(event, x, y, flags, param):
         f1 = f2 = 0
         crearRecorte(i)
 
-path = "PDI\Videos\Video6.mp4"
+path = "Videos\prueba2.mp4"
 cap = cv2.VideoCapture(path)
 cv2.namedWindow("frame",cv2.WINDOW_NORMAL)
 cv2.setMouseCallback("frame",cut)
@@ -58,13 +58,13 @@ while True:
                 print("Recortando Fotos")
                 for cant in range(frames):
                     img = frame[w:ew, h:eh]
-                    path = "PDI\Recortes\imagen" + "%d"%cant+".jpg"
+                    path = "Recortes\imagen" + "%d"%cant+".jpg"
                     cv2.imwrite(path,img)
                     ret, frame = cap.read()
                 stack_red, stack_green, stack_blue = registrarImagenes(frames)
                 shape = (stack_red.shape[1], stack_red.shape[2])
 
-                img_original = cv2.imread("PDI\Recortes\imagen0.jpg")
+                img_original = cv2.imread("Recortes\imagen0.jpg")
 
                 img_ecualizada = ecualizarImagenes(stack_red, stack_green, stack_blue)
                 img_media = aplicarMediaImagenes(stack_red, stack_green, stack_blue)
