@@ -1,7 +1,7 @@
 import cv2
 from matplotlib import pyplot as plt
 from procesar_imagenes import *
-
+import skimage
 
 i = w = h = f1 = f2 = ew = eh = 0
 frames = 60
@@ -39,7 +39,7 @@ def cut(event, x, y, flags, param):
         f1 = f2 = 0
         crearRecorte(i)
 
-path = "Videos\prueba2.mp4"
+path = "Videos\Video6.mp4"
 cap = cv2.VideoCapture(path)
 cv2.namedWindow("frame",cv2.WINDOW_NORMAL)
 cv2.setMouseCallback("frame",cut)
@@ -66,21 +66,16 @@ while True:
 
                 img_original = cv2.imread("Recortes\imagen0.jpg")
 
-                img_ecualizada = ecualizarImagenes(stack_red, stack_green, stack_blue)
-                img_media = aplicarMediaImagenes(stack_red, stack_green, stack_blue)
-                img_mediana = aplicarMedianaImagenes(stack_red, stack_green, stack_blue)
-                img_canny = aplicarBordesImagenes(stack_red, stack_green, stack_blue)
-                img_gauss = aplicarGuasianoImagenes(stack_red, stack_green, stack_blue)
                 img_high_boost = aplicarHighBoostImagenes(stack_red, stack_green, stack_blue)
 
-                img_ecualizada_pos = ecualizarImagenes_Local(img_high_boost, 50)
-                #img_ecualizada_pre = ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, 50)
+                img_ecualizada_pos = ecualizarImagenes_Local(img_high_boost, 49)
+                img_ecualizada_ad = skimage.exposure.equalize_adapthist(img_high_boost, 49)
 
                 fig = plt.figure()
                 fig.suptitle("Imagenes Registradas")
                 h1 = plt.subplot(1,3,1), plt.imshow(img_original), plt.title('Imagen Original')
-                h2 = plt.subplot(1,3,2), plt.imshow(img_ecualizada_pos, cmap='Greys'), plt.title('Ecualizacion Local Post')
-                #h3 = plt.subplot(1,3,3), plt.imshow(img_ecualizada_pre), plt.title('Ecualizacion Local Pre')
+                h2 = plt.subplot(1,3,2), plt.imshow(img_ecualizada_pos, cmap='Greys'), plt.title('Ecualizacion Local')
+                h3 = plt.subplot(1,3,3), plt.imshow(img_ecualizada_ad), plt.title('Ecualizacion Adaptativa')
                 plt.show()
             if cv2.waitKey(10) & 0xFF == ord('k'):
                 print("Video reanudado")

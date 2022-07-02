@@ -158,13 +158,15 @@ def aplicarHighBoostImagenes(stack_red, stack_green, stack_blue):
 def ecualizarImagenes_Local(image, kernel=3):
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = (kernel-1)//2
+    pcentral = (kernel+1)//2
     matrizDistancias = obtenerMatrizDistancias(kernel-1)
     shape = img_gray.shape
     nueva = np.zeros(shape, dtype="uint8")
     for i in range(delta, shape[0]-delta):
         for j in range(delta, shape[1]-delta):
             ecualize = cv2.equalizeHist(img_gray[i-delta:i+delta+1,j-delta:j+delta+1])
-            nueva[i,j] = np.mean(ecualize*matrizDistancias)
+            #nueva[i,j] = np.mean(ecualize*matrizDistancias)
+            nueva[i,j] = ecualize[pcentral, pcentral]
     return nueva
 
 def ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, kernel=3):
@@ -191,3 +193,16 @@ def obtenerMatrizDistancias(kernel):
             distancia = np.sqrt((c1*c1)+(c2*c2))
             matriz[i, j] = kernel-distancia
     return matriz
+
+def imadjust(x,a,b,c,d,gamma=1):
+    # Similar to imadjust in MATLAB.
+    # Converts an image range from [a,b] to [c,d].
+    # The Equation of a line can be used for this transformation:
+    #   y=((d-c)/(b-a))*(x-a)+c
+    # However, it is better to use a more generalized equation:
+    #   y=((x-a)/(b-a))^gamma*(d-c)+c
+    # If gamma is equal to 1, then the line equation is used.
+    # When gamma is not equal to 1, then the transformation is not linear.
+
+    y = (((x - a) / (b - a)) ** gamma) * (d - c) + c
+    return y
