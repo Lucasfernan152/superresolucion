@@ -42,7 +42,7 @@ def registrarImagenes(frames):
         
         homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC) 
         
-        transformed_img = cv2.warpPerspective(image_registrar, homography,(width, height))
+        transformed_img = (cv2.warpPerspective(image_registrar, homography,(width, height)))
         cv2.imwrite("Registradas\imagen"+str(j)+".jpg",transformed_img)
 
         set_red.append(transformed_img[::,::,0])
@@ -96,54 +96,6 @@ def aplicarMediaImagenes(stack_red, stack_green, stack_blue):
         equ_red = cv2.filter2D(stack_red[i,::,::],-1,kernel)
         equ_green = cv2.filter2D(stack_green[i,::,::],-1,kernel)
         equ_blue = cv2.filter2D(stack_blue[i,::,::],-1,kernel)
-        list_red.append(equ_red)
-        list_green.append(equ_green)
-        list_blue.append(equ_blue)
-    return promediarImagenes(list_red, list_green, list_blue)
-
-def aplicarMedianaImagenes(stack_red, stack_green, stack_blue):
-    list_red = []
-    list_green = []
-    list_blue = []
-    frames = stack_red.shape[0]
-    for i in range(frames):
-        equ_red = cv2.medianBlur(stack_red[i,::,::], 5)
-        equ_green = cv2.medianBlur(stack_green[i,::,::],5)
-        equ_blue = cv2.medianBlur(stack_blue[i,::,::],5)
-        list_red.append(equ_red)
-        list_green.append(equ_green)
-        list_blue.append(equ_blue)
-    return promediarImagenes(list_red, list_green, list_blue)
-
-def aplicarBordesImagenes(stack_red, stack_green, stack_blue):
-    list_red = []
-    list_green = []
-    list_blue = []
-    frames = stack_red.shape[0]
-    for i in range(frames):
-        desviacion = np.array(stack_red[i,::,::]).std()
-        media = np.array(stack_red[i,::,::]).mean()
-        equ_red = cv2.Canny(stack_red[i,::,::], media+desviacion, media-desviacion)
-        desviacion = np.array(stack_green[i,::,::]).std()
-        media = np.array(stack_green[i,::,::]).mean()
-        equ_green = cv2.Canny(stack_green[i,::,::], media+desviacion, media-desviacion)
-        desviacion = np.array(stack_blue[i,::,::]).std()
-        media = np.array(stack_blue[i,::,::]).mean()
-        equ_blue = cv2.Canny(stack_blue[i,::,::], media+desviacion, media-desviacion)
-        list_red.append(equ_red)
-        list_green.append(equ_green)
-        list_blue.append(equ_blue)
-    return promediarImagenes(list_red, list_green, list_blue)
-
-def aplicarGuasianoImagenes(stack_red, stack_green, stack_blue):
-    list_red = []
-    list_green = []
-    list_blue = []
-    frames = stack_red.shape[0]
-    for i in range(frames):
-        equ_red = cv2.GaussianBlur(stack_red[i,::,::], (3, 3), np.array(stack_red[i,::,::]).std())
-        equ_green = cv2.GaussianBlur(stack_green[i,::,::], (3, 3), np.array(stack_green[i,::,::]).std())
-        equ_blue = cv2.GaussianBlur(stack_blue[i,::,::], (3, 3), np.array(stack_blue[i,::,::]).std())
         list_red.append(equ_red)
         list_green.append(equ_green)
         list_blue.append(equ_blue)
