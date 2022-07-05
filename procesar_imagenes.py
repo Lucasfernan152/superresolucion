@@ -111,7 +111,7 @@ def aplicarHighBoostImagenes(stack_red, stack_green, stack_blue):
     imgHighBoost = 2*imgOriginal-imgMedia
     return imgHighBoost
 
-def ecualizarImagenes_Local(image, kernel=3):
+def ecualizarImagenes_Local(image, tipoColor, kernel=3):
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = (kernel-1)//2
     pcentral = (kernel+1)//2
@@ -122,17 +122,3 @@ def ecualizarImagenes_Local(image, kernel=3):
             ecualize = cv2.equalizeHist(img_gray[i-delta:i+delta+1,j-delta:j+delta+1])
             nueva[i,j] = ecualize[pcentral, pcentral]
     return nueva
-
-def ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, kernel=3):
-    list_red = []
-    list_green = []
-    list_blue = []
-    frames = stack_red.shape[0]
-    for i in range(frames):
-        equ_red = ecualizarImagenes_Local(stack_red[i,::,::], kernel)
-        equ_green = ecualizarImagenes_Local(stack_green[i,::,::], kernel)
-        equ_blue = ecualizarImagenes_Local(stack_blue[i,::,::], kernel)
-        list_red.append(equ_red)
-        list_green.append(equ_green)
-        list_blue.append(equ_blue)
-    return promediarImagenes(list_red, list_green, list_blue)
