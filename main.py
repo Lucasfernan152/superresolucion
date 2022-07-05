@@ -1,4 +1,5 @@
 import cv2
+from cv2 import cvtColor
 from matplotlib import pyplot as plt
 from procesar_imagenes import *
 import skimage
@@ -47,7 +48,7 @@ def grabarVideo(image_folder, video_name):
     cv2.destroyAllWindows()
     video.release()
 
-def reproducirVideos(path1, path2):
+def reproducirVideos(path1, path2, tipoColor):
     cap1 = cv2.VideoCapture(path1)
     cv2.namedWindow("frame1", cv2.WINDOW_NORMAL)
     cap2 = cv2.VideoCapture(path2)
@@ -64,6 +65,8 @@ def reproducirVideos(path1, path2):
             cap1 = cv2.VideoCapture(path1)
             cap2 = cv2.VideoCapture(path2)
         cv2.imshow("frame1", frame1)
+        if(tipoColor == 2):
+            frame2 = cv2.cvtColor(frame2, cv2.COLOR_HSV2RGB)
         cv2.imshow("frame2", frame2)
         if cv2.waitKey(10) & 0xFF == ord('q'):
             break
@@ -123,13 +126,16 @@ while True:
                             path = "Recortes\imagen" + "%d"%cant+".jpg"
                             cv2.imwrite(path,img)
                             ret, frame = cap.read()
-                        stack_red, stack_green, stack_blue = registrarImagenes(frames)
+                        print('1) Ecualizar mediante RGB')
+                        print('2) Ecualizar mediante HSV')
+                        tipoColor = int(input('Seleccione una opcion: '))
+                        stack_red, stack_green, stack_blue = registrarImagenes(frames, tipoColor)
                         shape = (stack_red.shape[1], stack_red.shape[2])
 
                         #Mostrar imagenes recortadas y registradas
                         grabarVideo('Recortes', 'Recortadas')
                         grabarVideo('Registradas', 'Registradas')
-                        reproducirVideos('Videos\Recortadas.mp4', 'Videos\Registradas.mp4')
+                        reproducirVideos('Videos\Recortadas.mp4', 'Videos\Registradas.mp4', tipoColor)
 
                         img_original = cv2.cvtColor(cv2.imread("Recortes\imagen0.jpg"), cv2.COLOR_BGR2RGB)
                         img_high_boost = cv2.cvtColor(aplicarHighBoostImagenes(stack_red, stack_green, stack_blue), cv2.COLOR_BGR2RGB)

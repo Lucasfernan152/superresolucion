@@ -2,7 +2,7 @@ import cv2
 import matplotlib.image as img
 import numpy as np
 
-def registrarImagenes(frames):
+def registrarImagenes(frames, tipoColor):
     orb_detector = cv2.ORB_create(5000)
     set_red = []
     set_green = []
@@ -42,7 +42,11 @@ def registrarImagenes(frames):
         
         homography, mask = cv2.findHomography(p1, p2, cv2.RANSAC) 
         
-        transformed_img = (cv2.warpPerspective(image_registrar, homography,(width, height)))
+        if(tipoColor == 1):
+             transformed_img = cv2.warpPerspective(image_registrar, homography,(width, height))
+        else:
+            transformed_img = cv2.cvtColor(cv2.warpPerspective(image_registrar, homography,(width, height)), cv2.COLOR_RGB2HSV)
+       
         cv2.imwrite("Registradas\imagen"+str(j)+".jpg",transformed_img)
 
         set_red.append(transformed_img[::,::,0])
@@ -111,13 +115,11 @@ def ecualizarImagenes_Local(image, kernel=3):
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = (kernel-1)//2
     pcentral = (kernel+1)//2
-    matrizDistancias = obtenerMatrizDistancias(kernel-1)
     shape = img_gray.shape
     nueva = np.zeros(shape, dtype="uint8")
     for i in range(delta, shape[0]-delta):
         for j in range(delta, shape[1]-delta):
             ecualize = cv2.equalizeHist(img_gray[i-delta:i+delta+1,j-delta:j+delta+1])
-            #nueva[i,j] = np.mean(ecualize*matrizDistancias)
             nueva[i,j] = ecualize[pcentral, pcentral]
     return nueva
 
@@ -134,27 +136,3 @@ def ecualizarImagenes_Local_pre(stack_red, stack_green, stack_blue, kernel=3):
         list_green.append(equ_green)
         list_blue.append(equ_blue)
     return promediarImagenes(list_red, list_green, list_blue)
-
-def obtenerMatrizDistancias(kernel):
-    matriz = np.ones((kernel, kernel))
-    centro = [(kernel+1)//2-1, (kernel+1)//2-1]
-    for i in range(kernel):
-        for j in range(kernel):
-            c1 = centro[0]-i
-            c2 = centro[1]-j
-            distancia = np.sqrt((c1*c1)+(c2*c2))
-            matriz[i, j] = kernel-distancia
-    return matriz
-
-def imadjust(x,a,b,c,d,gamma=1):
-    # Similar to imadjust in MATLAB.
-    # Converts an image range from [a,b] to [c,d].
-    # The Equation of a line can be used for this transformation:
-    #   y=((d-c)/(b-a))*(x-a)+c
-    # However, it is better to use a more generalized equation:
-    #   y=((x-a)/(b-a))^gamma*(d-c)+c
-    # If gamma is equal to 1, then the line equation is used.
-    # When gamma is not equal to 1, then the transformation is not linear.
-
-    y = (((x - a) / (b - a)) ** gamma) * (d - c) + c
-    return y
