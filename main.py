@@ -6,7 +6,7 @@ import skimage
 import os
 
 frames = 30
-kernel = 49
+kernel = 15
 num_video = 1
 w = h = f1 = f2 = ew = eh = 0
 

@@ -11,7 +11,6 @@ def registrarImagenes(frames, tipoColor):
     image_base = img.imread(path)
     
     img2 = cv2.cvtColor(image_base, cv2.COLOR_BGR2GRAY)
-    kp1, d1 = orb_detector.detectAndCompute(img2, None) 
 
     for j in range(0, frames):
         path1 = "Recortes\imagen"+str(j)+".jpg"
@@ -31,7 +30,7 @@ def registrarImagenes(frames, tipoColor):
         matches = tuple(matches)
         
         matches = matches[:int(len(matches)*90)]
-        no_of_matches = len(matches) 
+        no_of_matches = len(matches)
         
         p1 = np.zeros((no_of_matches, 2)) 
         p2 = np.zeros((no_of_matches, 2)) 
@@ -111,7 +110,7 @@ def aplicarHighBoostImagenes(stack_red, stack_green, stack_blue):
     imgHighBoost = 2*imgOriginal-imgMedia
     return imgHighBoost
 
-def ecualizarImagenes_Local(image, tipoColor, kernel=3):
+def ecualizarImagenes_Local(image, kernel=3):
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     delta = (kernel-1)//2
     pcentral = (kernel+1)//2
